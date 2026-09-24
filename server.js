@@ -29,7 +29,9 @@ app.use(cors({
   allowedHeaders: ["Content-Type"],
 }));
 
-app.use(express.json({ limit: "64kb" }));app.get("/", (_req, res) => {
+app.use(express.json({ limit: "64kb" }));app.get("/appointment", (_req, res) => { res.sendFile(path.join(__dirname, "appointment.html")); });
+
+app.get("/", (_req, res) => {
   res.sendFile(require("path").join(__dirname, "frontend-widget.html"));
 });
 
