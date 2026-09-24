@@ -38,7 +38,7 @@ const appointmentLimiter = rateLimit({
   message: { error: "Too many appointment requests. Please try again later." }
 });
 
-app.get("/health", (_req, res) => {
+app.get("/", (_req, res) => {\n  res.sendFile(path.join(__dirname, "frontend-widget.html"));\n});\n\napp.get("/health", (_req, res) => {
   res.json({
     ok: true,
     service: "Tahsinullah Riyad Custom AI",
