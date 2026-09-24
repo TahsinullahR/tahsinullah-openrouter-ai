@@ -3,6 +3,7 @@
 const express = require("express");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
+const appointmentRoutes = require("./appointment-routes");
 
 const app = express();
 const PORT = Number(process.env.PORT || 3001);
@@ -28,9 +29,13 @@ app.use(cors({
   allowedHeaders: ["Content-Type"],
 }));
 
-app.use(express.json({ limit: "64kb" }));app.get("/", (_req, res) => {
+app.use(express.json({ limit: "64kb" }));app.get("/appointment", (_req, res) => { res.sendFile(path.join(__dirname, "appointment.html")); });
+
+app.get("/", (_req, res) => {
   res.sendFile(require("path").join(__dirname, "frontend-widget.html"));
 });
+
+const appointmentLimiter = rateLimit({windowMs:10*60*1000,limit:Number(process.env.APPOINTMENT_RATE_LIMIT||8),standardHeaders:true,legacyHeaders:false,message:{error:"Too many booking attempts. Please try later."}});
 
 const limiter = rateLimit({
   windowMs: 60 * 1000,
@@ -47,6 +52,8 @@ app.get("/health", (_req, res) => {
     model: OPENROUTER_MODEL,
   });
 });
+
+appointmentRoutes.routes(app, appointmentLimiter);
 
 app.post("/api/chat", limiter, async (req, res) => {
   try {
