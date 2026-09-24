@@ -59,6 +59,7 @@ const fullText=await readStream(response,bot);if(!fullText)throw new Error("Empt
 }catch(error){console.error("Tahsinullah AI:",error);bot.textContent=error.message.includes("Too many requests")?"You’ve reached the short-term request limit. Please wait a moment and try again.":"Sorry, I couldn’t complete that request. Please try again."}
 finally{streaming=false;send.disabled=false;input.disabled=false;newChat.disabled=false;input.focus()}
 });
+const bookAppointment=document.getElementById("tr-ai-book");if(bookAppointment)bookAppointment.onclick=()=>window.open("https://tahsinullah-openrouter-ai.onrender.com/appointment","_blank","noopener");
 loadHistory();
 })();
 </script>
