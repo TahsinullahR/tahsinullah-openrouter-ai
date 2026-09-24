@@ -7,6 +7,7 @@ const rateLimit = require("express-rate-limit");
 const appointmentRoutes = require("./appointment-routes");
 
 const app = express();
+app.set("trust proxy", 1);
 const PORT = Number(process.env.PORT || 3001);
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
