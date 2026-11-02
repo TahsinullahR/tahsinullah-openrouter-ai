@@ -10,8 +10,8 @@ const app = express();
 app.set("trust proxy", 1);
 const PORT = Number(process.env.PORT || 3001);
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
+const VENICE_API_KEY = process.env.VENICE_API_KEY;
+const VENICE_MODEL = process.env.VENICE_MODEL || "venice-uncensored";
 const SITE_URL = process.env.SITE_URL || "https://tahsinullahriyad.world";
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "").split(",").map(s => s.trim()).filter(Boolean);
 const RATE_LIMIT_PER_MINUTE = Number(process.env.RATE_LIMIT_PER_MINUTE || 20);
@@ -47,7 +47,7 @@ app.get("/health", (_req, res) => {
   res.json({
     ok: true,
     service: "Tahsinullah Riyad Custom AI",
-    model: OPENROUTER_MODEL
+    provider: "Venice AI", model: VENICE_MODEL
   });
 });
 
@@ -58,8 +58,8 @@ app.get("/appointment", (_req, res) => {
 appointmentRoutes.routes(app, appointmentLimiter);
 
 app.post("/api/chat", async (req, res) => {
-  if (!OPENROUTER_API_KEY) {
-    return res.status(500).json({ error: "OPENROUTER_API_KEY is not configured." });
+  if (!VENICE_API_KEY) {
+    return res.status(503).json({ error: "VENICE_API_KEY is not configured on the server." });
   }
 
   const messages = Array.isArray(req.body?.messages) ? req.body.messages : [];
@@ -80,16 +80,14 @@ app.post("/api/chat", async (req, res) => {
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch("https://api.venice.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": SITE_URL,
-        "X-Title": "Tahsinullah Riyad Custom AI"
+        Authorization: `Bearer ${VENICE_API_KEY}`,
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: OPENROUTER_MODEL,
+        model: VENICE_MODEL,
         messages: [
           {
             role: "system",
@@ -106,7 +104,7 @@ app.post("/api/chat", async (req, res) => {
 
     if (!response.ok) {
       const body = await response.text();
-      return res.status(response.status).json({ error: body || "OpenRouter request failed." });
+      return res.status(response.status).json({ error: body || "Venice AI request failed." });
     }
 
     res.status(200);
@@ -135,7 +133,7 @@ app.post("/api/chat", async (req, res) => {
     clearTimeout(timeout);
     if (!res.headersSent) {
       res.status(error?.name === "AbortError" ? 504 : 500).json({
-        error: error?.name === "AbortError" ? "OpenRouter request timed out." : "AI request failed."
+        error: error?.name === "AbortError" ? "Venice AI request timed out." : "AI request failed."
       });
     } else {
       res.end();
@@ -148,5 +146,5 @@ app.use("/studio", express.static(path.join(__dirname, "studio"), { index: "inde
 
 app.listen(PORT, () => {
   console.log(`AI backend running on port ${PORT}`);
-  console.log(`Model: ${OPENROUTER_MODEL}`);
+  console.log(`Provider: Venice AI · Model: ${VENICE_MODEL}`);
 });
