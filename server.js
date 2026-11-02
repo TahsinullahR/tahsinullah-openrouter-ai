@@ -144,6 +144,7 @@ app.post("/api/chat", async (req, res) => {
 });
 
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/studio", express.static(path.join(__dirname, "studio"), { index: "index.html" }));
 
 app.listen(PORT, () => {
   console.log(`AI backend running on port ${PORT}`);
