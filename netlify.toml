@@ -1,0 +1,7 @@
+[build]
+  command = "echo 'Riyad AI Studio static site ready'"
+  publish = "studio"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
