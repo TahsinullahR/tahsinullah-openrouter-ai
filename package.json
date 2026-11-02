@@ -1,0 +1,13 @@
+{
+  "name": "riyad-ai-studio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "node -e \"console.log('Static site ready')\""
+  },
+  "devDependencies": {
+    "netlify-cli": "^23.5.0"
+  }
+}
