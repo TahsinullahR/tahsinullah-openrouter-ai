@@ -4,7 +4,6 @@ const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
-const appointmentRoutes = require("./appointment-routes");
 
 const app = express();
 app.set("trust proxy", 1);
@@ -31,16 +30,8 @@ const limiter = rateLimit({
 });
 app.use("/api/chat", limiter);
 
-const appointmentLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
-  limit: Number(process.env.APPOINTMENT_RATE_LIMIT || 8),
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
-  message: { error: "Too many appointment requests. Please try again later." }
-});
-
 app.get("/", (_req, res) => {
-  res.sendFile(path.join(__dirname, "frontend-widget.html"));
+  res.sendFile(path.join(__dirname, "studio", "index.html"));
 });
 
 app.get("/health", (_req, res) => {
@@ -51,11 +42,6 @@ app.get("/health", (_req, res) => {
   });
 });
 
-app.get("/appointment", (_req, res) => {
-  res.sendFile(path.join(__dirname, "appointment.html"));
-});
-
-appointmentRoutes.routes(app, appointmentLimiter);
 
 app.post("/api/chat", async (req, res) => {
   if (!VENICE_API_KEY) {
